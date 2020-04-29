@@ -3,6 +3,7 @@
 2. Run the file using `python3 bezier.py`.
 3. Use left click to add new points, right click on existing points to delete them, and use middle click to move points. Middle click on a point, and click on any other location in the canvas - the point will be moved to that location. If you middle clicked on a node by mistake, use `U` to undo your action. 
 4. After adding nodes, to draw the Bezier curve, press `D` on your keyboard, use `R` for refresh, and `C` to clear the entire screen. A sample output is shown below.
+5. The code has been commented.
 
 ![Simple Bezier Curve](simple_bezier_curve.png)
 
