@@ -13,10 +13,29 @@ class BezierWindow(QWidget):
         self.isModified = True
         self.func = (None, None)
         self.move_index = None
-
+        self.bezier_drawn = False
         self.setGeometry(0, 0, 1024, 650)
         self.setWindowTitle('Bezier Drawings - IS F311')    
         self.show()
+
+    def get_bezier_point(self, points, t):
+        values = []
+        for i in range(1, len(points)):
+            values.append((points[i] * t) + (points[i-1] * (1-t)))
+        if len(values) == 1:
+            return values[0]
+        else:
+            return self.get_bezier_point(values, t)
+
+    def drawBezier(self, qp):
+        if not self.bezier_drawn:
+            t_values = [i * 0.0005 for i in range(0, 2001)]
+            pen = QPen(Qt.blue, 3, Qt.SolidLine)
+            qp.setPen(pen)
+            for t in t_values:
+                bezier_point = self.get_bezier_point(self.points, t)
+                qp.drawPoint(bezier_point)
+            self.bezier_drawn = True
 
     def paintEvent(self, event):
         if self.isModified:
@@ -38,7 +57,7 @@ class BezierWindow(QWidget):
         qp.end()
 
     def addNode(self, qp, point, verbose=True):
-        pen = QPen(Qt.blue, 7, Qt.SolidLine)
+        pen = QPen(Qt.red, 7, Qt.SolidLine)
         qp.setPen(pen)
         qp.drawPoint(point)
         self.points.append(point)
@@ -100,7 +119,6 @@ class BezierWindow(QWidget):
                 self.func = (self.redrawNodes, {})
                 self.isModified = True
                 self.move_index = None
-
         else:
             print("Unidentified click (is this even possible?)")
             return
@@ -109,13 +127,26 @@ class BezierWindow(QWidget):
     def keyPressEvent(self, event):
         user_input = event.key()
         if user_input == Qt.Key_C:
-            print("Clear Screen")
+            print("Clear Screen (C)")
             self.mPixmap.swap(QPixmap());
             self.update()
             self.points = []
         elif user_input == Qt.Key_U:
+            print("Selection undone (U)")
             self.move_index = None
-            print("Selection undone. (if made)")
+        elif user_input == Qt.Key_D:
+            print("Draw Bezier Curve (D)")
+            self.func = (self.drawBezier, {})
+            self.isModified = True
+            self.update()
+        if user_input == Qt.Key_R:
+            print("Refresh Screen (R)")
+            self.mPixmap.swap(QPixmap());
+            self.update()
+            self.func = (self.redrawNodes, {})
+            self.isModified = True
+            self.update()
+            self.bezier_drawn = False
         else:
             print("Unidentified input.")
 
